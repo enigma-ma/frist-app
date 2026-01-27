@@ -1,41 +1,54 @@
-
-# YouTube Downloader Application Blueprint
+# Application Blueprint
 
 ## Overview
 
-This document outlines the design and features of a YouTube Downloader application built with Flutter. The app allows users to search for YouTube videos, download them in various formats, manage their download history, and customize settings.
+This document outlines the design, features, and implementation plan for the All-in-One Downloader application. The goal is to create a modern, intuitive, and feature-rich video and audio downloader for various platforms.
+
+## Style and Design
+
+The application will feature a dark-themed UI with blue accents, providing a visually appealing and user-friendly experience. The design will be clean, with clear typography and iconography to guide the user.
+
+- **Theme**: Dark theme with a primary color of blue.
+- **Typography**: Clean and readable fonts, with a clear hierarchy for titles, subtitles, and body text.
+- **Iconography**: Modern and intuitive icons for navigation and actions.
 
 ## Features
 
-* **Search:** Users can search for YouTube videos by entering a query. The app will display a list of search results with thumbnails, titles, and channel information.
-* **Downloader:** Users can select a video from the search results and choose to download it as an audio or video file. The app will display the download progress and status.
-* **History:** The app will maintain a history of downloaded videos, allowing users to easily access and manage their downloaded content.
-* **Settings:** Users can customize the app's settings, such as the preferred download quality and theme (light/dark mode).
+### Core Features
 
-## Architecture
+- **Video/Audio Downloader**: Download videos and audio from various sources.
+- **Search**: Search for videos directly within the app.
+- **Playlist Downloader**: Download entire playlists with a single tap.
+- **Multiple Formats**: Choose from various video and audio formats and qualities.
+- **Download Manager**: Track active and completed downloads.
 
-The app follows a feature-first architecture, with each feature (search, downloader, history, settings) having its own dedicated directory containing the necessary widgets, screens, and services. The app uses the `provider` package for state management, specifically for managing the theme.
+### Implemented Features (Current Version)
 
-## Final Implementation
+- Basic video and playlist downloads from YouTube.
+- Simple search functionality.
+- Basic UI with a single search/input field.
+- A simple screen to show download options.
 
-### Step 1: Project Setup and Initial UI
+## Redesign Plan
 
-* **Create Project Structure:** Set up the basic directory structure for the project, including folders for each feature, as well as for models, providers, and themes.
-* **Initialize Firebase:** Initialize Firebase in the `main.dart` file.
-* **Implement Basic UI:** Create the main screen of the application with a `BottomNavigationBar` to switch between the different features. Create placeholder screens for each feature.
-* **Set up Theme:** Create a `ThemeProvider` to manage the app's theme and define light and dark themes in an `app_theme.dart` file.
+The following steps will be taken to implement the new UI and features:
 
-### Step 2: Search and Downloader Implementation
+1.  **Implement Bottom Navigation**: Create a main screen with a bottom navigation bar for Home, Search, My Files, and Settings.
+2.  **Redesign Home Screen**:
+    -   Add a "Welcome back" message.
+    -   Implement a new search/URL input field with a "Paste" button.
+    -   Add shortcuts for popular services (YouTube, Instagram, TikTok, Facebook).
+    -   Include a "Quick Tips" section.
+3.  **Redesign Download Options Screen**:
+    -   Integrate a video player for previewing content.
+    -   Display video title, channel information, and other metadata.
+    -   Show a list of available video and audio download options with quality and file size.
+    -   Implement a "Download Now" button that shows the selected file size.
+4.  **Create Downloads Screen**:
+    -   Create a tabbed view for "Downloading" and "Completed" downloads.
+    -   Display a list of active downloads with progress indicators.
+    -   Show a list of recently completed downloads with options to play, share, and save.
+5.  **Create Settings Screen**: Implement a settings screen with options to manage app preferences.
+6.  **Update Theme**: Apply the new dark theme with blue accents throughout the application.
 
-*   **Add Dependencies:** Add `youtube_explode_dart`, `permission_handler`, and `path_provider` to `pubspec.yaml`.
-*   **Create YoutubeService:** Implement a `YoutubeService` to fetch video data from YouTube.
-*   **Create Video Model:** Create a `Video` model to represent video data.
-*   **Implement Search UI:** Update the `SearchScreen` to use the `YoutubeService` to search for videos and display the results in a `ListView`.
-*   **Create DownloaderService:** Implement a `DownloaderService` to handle the logic for downloading audio and video streams.
-*   **Implement Downloader UI:** Update the `DownloaderScreen` to allow users to download the selected video as an audio or video file. Display a progress indicator during the download.
-
-### Step 3: History and Settings Implementation
-
-*   **Create HistoryService:** Implement a `HistoryService` to get the list of downloaded files.
-*   **Implement History UI:** Update the `HistoryScreen` to display the list of downloaded files and allow users to delete them.
-*   **Implement Settings UI:** Update the `SettingsScreen` to include a `Switch` to toggle between light and dark themes.
+This blueprint will be updated as new features are added and the application evolves.

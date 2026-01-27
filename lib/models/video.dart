@@ -4,6 +4,7 @@ class Video {
   final String author;
   final String thumbnailUrl;
   final String? filePath;
+  final DateTime? downloadDate;
 
   Video({
     required this.id,
@@ -11,6 +12,7 @@ class Video {
     required this.author,
     required this.thumbnailUrl,
     this.filePath,
+    this.downloadDate,
   });
 
   factory Video.fromYoutubeExplode(dynamic video) {
@@ -29,6 +31,7 @@ class Video {
       'author': author,
       'thumbnailUrl': thumbnailUrl,
       'filePath': filePath,
+      'downloadDate': downloadDate?.toIso8601String(),
     };
   }
 
@@ -39,6 +42,7 @@ class Video {
       author: map['author'],
       thumbnailUrl: map['thumbnailUrl'],
       filePath: map['filePath'],
+      downloadDate: map['downloadDate'] != null ? DateTime.parse(map['downloadDate']) : null,
     );
   }
 }

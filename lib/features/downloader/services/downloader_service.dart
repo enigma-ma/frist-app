@@ -1,3 +1,4 @@
+
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -7,53 +8,92 @@ class DownloaderService {
   final YoutubeExplode _youtubeExplode = YoutubeExplode();
 
   Future<bool> requestPermission() async {
-    final status = await Permission.storage.request();
+    var status = await Permission.storage.request();
+    if (!status.isGranted) {
+      status = await Permission.manageExternalStorage.request();
+    }
     return status.isGranted;
   }
 
-  Future<String?> downloadAudio(String videoId, String videoTitle) async {
-    if (await requestPermission()) {
-      try {
-        final streamManifest = await _youtubeExplode.videos.streamsClient.getManifest(videoId);
-        final audioStream = streamManifest.audioOnly.withHighestBitrate();
-        final directory = await getExternalStorageDirectory();
-        final filePath = '${directory!.path}/$videoTitle.mp3';
-        final file = File(filePath);
-        final fileStream = file.openWrite();
-
-        await _youtubeExplode.videos.streamsClient.get(audioStream).pipe(fileStream);
-
-        await fileStream.flush();
-        await fileStream.close();
-        return filePath;
-      } catch (e) {
-        print('Error downloading audio: $e');
-        return null;
+  Future<List<String>> getAvailableVideoQualities(String videoId) async {
+    try {
+      final manifest = await _youtubeExplode.videos.streamsClient.getManifest(videoId);
+      final qualities = <String>{};
+      for (var stream in manifest.muxed) {
+        qualities.add('${stream.videoResolution.height}p');
       }
+      final sortedQualities = qualities.toList();
+      sortedQualities.sort((a, b) {
+        final aRes = int.tryParse(a.replaceAll('p', '')) ?? 0;
+        final bRes = int.tryParse(b.replaceAll('p', '')) ?? 0;
+        return bRes.compareTo(aRes);
+      });
+      return sortedQualities;
+    } catch (e) {
+      return [];
     }
-    return null;
   }
 
-  Future<String?> downloadVideo(String videoId, String videoTitle) async {
-    if (await requestPermission()) {
-      try {
-        final streamManifest = await _youtubeExplode.videos.streamsClient.getManifest(videoId);
-        final videoStream = streamManifest.muxed.withHighestBitrate();
-        final directory = await getExternalStorageDirectory();
-        final filePath = '${directory!.path}/$videoTitle.mp4';
-        final file = File(filePath);
-        final fileStream = file.openWrite();
+  Future<String?> downloadAudio(String videoId, String videoTitle, Function(double) onProgress) async {
+    if (!await requestPermission()) return null;
 
-        await _youtubeExplode.videos.streamsClient.get(videoStream).pipe(fileStream);
+    try {
+      final manifest = await _youtubeExplode.videos.streamsClient.getManifest(videoId);
+      final streamInfo = manifest.audioOnly.withHighestBitrate();
+      final directory = await getExternalStorageDirectory();
+      final filePath = '${directory!.path}/${_sanitizeFileName(videoTitle)}.m4a';
+      final file = File(filePath);
+      final fileStream = file.openWrite();
 
-        await fileStream.flush();
-        await fileStream.close();
-        return filePath;
-      } catch (e) {
-        print('Error downloading video: $e');
-        return null;
+      final totalBytes = streamInfo.size.totalBytes;
+      var receivedBytes = 0;
+
+      final stream = _youtubeExplode.videos.streamsClient.get(streamInfo);
+      await for (var data in stream) {
+        receivedBytes += data.length;
+        fileStream.add(data);
+        onProgress(receivedBytes / totalBytes);
       }
+
+      await fileStream.flush();
+      await fileStream.close();
+      return filePath;
+    } catch (e) {
+      return null;
     }
-    return null;
+  }
+
+  Future<String?> downloadVideo(String videoId, String videoTitle, String quality, Function(double) onProgress) async {
+    if (!await requestPermission()) return null;
+
+    try {
+      final manifest = await _youtubeExplode.videos.streamsClient.getManifest(videoId);
+      final streamInfo = manifest.muxed.firstWhere((s) => '${s.videoResolution.height}p' == quality);
+
+      final directory = await getExternalStorageDirectory();
+      final filePath = '${directory!.path}/${_sanitizeFileName(videoTitle)}.mp4';
+      final file = File(filePath);
+      final fileStream = file.openWrite();
+
+      final totalBytes = streamInfo.size.totalBytes;
+      var receivedBytes = 0;
+
+      final stream = _youtubeExplode.videos.streamsClient.get(streamInfo);
+      await for (var data in stream) {
+        receivedBytes += data.length;
+        fileStream.add(data);
+        onProgress(receivedBytes / totalBytes);
+      }
+
+      await fileStream.flush();
+      await fileStream.close();
+      return filePath;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  String _sanitizeFileName(String fileName) {
+    return fileName.replaceAll(RegExp(r'[\\/:]'), '_');
   }
 }

@@ -21,8 +21,9 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2, // Incremented version
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade, // Added onUpgrade
     );
   }
 
@@ -33,8 +34,16 @@ class DatabaseHelper {
         title TEXT,
         author TEXT,
         thumbnailUrl TEXT,
-        filePath TEXT
+        filePath TEXT,
+        downloadDate TEXT
       )
     ''');
+  }
+
+  // Added onUpgrade to handle schema migration
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('ALTER TABLE videos ADD COLUMN downloadDate TEXT');
+    }
   }
 }

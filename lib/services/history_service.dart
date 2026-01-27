@@ -1,12 +1,13 @@
 import 'package:myapp/database/database_helper.dart';
 import 'package:myapp/models/video.dart';
+import 'package:sqflite/sqflite.dart';
 
 class HistoryService {
   final dbHelper = DatabaseHelper();
 
   Future<List<Video>> getDownloadedVideos() async {
     final db = await dbHelper.database;
-    final maps = await db.query('videos');
+    final maps = await db.query('videos', orderBy: 'downloadDate DESC');
 
     return List.generate(maps.length, (i) {
       return Video.fromMap(maps[i]);
@@ -15,9 +16,18 @@ class HistoryService {
 
   Future<void> saveVideo(Video video) async {
     final db = await dbHelper.database;
+    final videoToSave = Video(
+      id: video.id,
+      title: video.title,
+      author: video.author,
+      thumbnailUrl: video.thumbnailUrl,
+      filePath: video.filePath,
+      downloadDate: video.downloadDate ?? DateTime.now(),
+    );
     await db.insert(
       'videos',
-      video.toMap(),
+      videoToSave.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
