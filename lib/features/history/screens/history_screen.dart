@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:youtube_downloader/features/history/services/history_service.dart';
+import 'package:myapp/models/video.dart';
+import 'package:myapp/services/history_service.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -11,19 +12,29 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen> {
   final HistoryService _historyService = HistoryService();
-  late Future<List<File>> _downloadedFiles;
+  late Future<List<Video>> _downloadedVideos;
 
   @override
   void initState() {
     super.initState();
-    _downloadedFiles = _historyService.getDownloadedFiles();
+    _loadVideos();
   }
 
-  void _deleteFile(File file) async {
-    await file.delete();
+  void _loadVideos() {
     setState(() {
-      _downloadedFiles = _historyService.getDownloadedFiles();
+      _downloadedVideos = _historyService.getDownloadedVideos();
     });
+  }
+
+  Future<void> _deleteVideo(Video video) async {
+    if (video.filePath != null) {
+      final file = File(video.filePath!);
+      if (await file.exists()) {
+        await file.delete();
+      }
+    }
+    await _historyService.deleteVideo(video.id);
+    _loadVideos();
   }
 
   @override
@@ -32,26 +43,27 @@ class _HistoryScreenState extends State<HistoryScreen> {
       appBar: AppBar(
         title: const Text('History'),
       ),
-      body: FutureBuilder<List<File>>(
-        future: _downloadedFiles,
+      body: FutureBuilder<List<Video>>(
+        future: _downloadedVideos,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return const Center(child: Text('Error loading downloaded files'));
+            return const Center(child: Text('Error loading downloaded videos'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No downloaded files yet'));
+            return const Center(child: Text('No downloaded videos yet'));
           } else {
             return ListView.builder(
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
-                final file = snapshot.data![index];
+                final video = snapshot.data![index];
                 return ListTile(
-                  title: Text(file.path.split('/').last),
-                  leading: const Icon(Icons.video_file),
+                  leading: Image.network(video.thumbnailUrl, width: 100, fit: BoxFit.cover),
+                  title: Text(video.title),
+                  subtitle: Text(video.author),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete),
-                    onPressed: () => _deleteFile(file),
+                    onPressed: () => _deleteVideo(video),
                   ),
                 );
               },

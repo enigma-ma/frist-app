@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_downloader/models/video.dart';
-import 'package:youtube_downloader/features/downloader/screens/downloader_screen.dart';
+import 'package:myapp/models/video.dart';
+import 'package:myapp/features/downloader/screens/downloader_screen.dart';
 
 class VideoCard extends StatelessWidget {
   final Video video;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_downloader/models/video.dart';
-import 'package:youtube_downloader/features/downloader/services/downloader_service.dart';
+import 'package:myapp/models/video.dart';
+import 'package:myapp/features/downloader/services/downloader_service.dart';
+import 'package:myapp/services/history_service.dart';
 
 class DownloaderScreen extends StatefulWidget {
   final Video video;
@@ -13,6 +14,7 @@ class DownloaderScreen extends StatefulWidget {
 
 class _DownloaderScreenState extends State<DownloaderScreen> {
   final DownloaderService _downloaderService = DownloaderService();
+  final HistoryService _historyService = HistoryService();
   final ValueNotifier<double> _downloadProgress = ValueNotifier(0.0);
   bool _isDownloading = false;
 
@@ -20,7 +22,17 @@ class _DownloaderScreenState extends State<DownloaderScreen> {
     setState(() {
       _isDownloading = true;
     });
-    await _downloaderService.downloadAudio(widget.video.id, widget.video.title);
+    final filePath = await _downloaderService.downloadAudio(widget.video.id, widget.video.title);
+    if (filePath != null) {
+      final videoToSave = Video(
+        id: widget.video.id,
+        title: widget.video.title,
+        author: widget.video.author,
+        thumbnailUrl: widget.video.thumbnailUrl,
+        filePath: filePath,
+      );
+      await _historyService.saveVideo(videoToSave);
+    }
     setState(() {
       _isDownloading = false;
     });
@@ -30,7 +42,17 @@ class _DownloaderScreenState extends State<DownloaderScreen> {
     setState(() {
       _isDownloading = true;
     });
-    await _downloaderService.downloadVideo(widget.video.id, widget.video.title);
+    final filePath = await _downloaderService.downloadVideo(widget.video.id, widget.video.title);
+    if (filePath != null) {
+      final videoToSave = Video(
+        id: widget.video.id,
+        title: widget.video.title,
+        author: widget.video.author,
+        thumbnailUrl: widget.video.thumbnailUrl,
+        filePath: filePath,
+      );
+      await _historyService.saveVideo(videoToSave);
+    }
     setState(() {
       _isDownloading = false;
     });

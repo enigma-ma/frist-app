@@ -11,7 +11,7 @@ class DownloaderService {
     return status.isGranted;
   }
 
-  Future<void> downloadAudio(String videoId, String videoTitle) async {
+  Future<String?> downloadAudio(String videoId, String videoTitle) async {
     if (await requestPermission()) {
       try {
         final streamManifest = await _youtubeExplode.videos.streamsClient.getManifest(videoId);
@@ -25,13 +25,16 @@ class DownloaderService {
 
         await fileStream.flush();
         await fileStream.close();
+        return filePath;
       } catch (e) {
         print('Error downloading audio: $e');
+        return null;
       }
     }
+    return null;
   }
 
-  Future<void> downloadVideo(String videoId, String videoTitle) async {
+  Future<String?> downloadVideo(String videoId, String videoTitle) async {
     if (await requestPermission()) {
       try {
         final streamManifest = await _youtubeExplode.videos.streamsClient.getManifest(videoId);
@@ -45,9 +48,12 @@ class DownloaderService {
 
         await fileStream.flush();
         await fileStream.close();
+        return filePath;
       } catch (e) {
         print('Error downloading video: $e');
+        return null;
       }
     }
+    return null;
   }
 }

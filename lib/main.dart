@@ -3,13 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 
-import 'package:youtube_downloader/app/theme/app_theme.dart';
-import 'package:youtube_downloader/providers/theme_provider.dart';
+import 'package:myapp/app/theme/app_theme.dart';
+import 'package:myapp/providers/theme_provider.dart';
 
-import 'package:youtube_downloader/features/search/screens/search_screen.dart';
-import 'package:youtube_downloader/features/downloader/screens/downloader_screen.dart';
-import 'package:youtube_downloader/features/history/screens/history_screen.dart';
-import 'package:youtube_downloader/features/settings/screens/settings_screen.dart';
+import 'package:myapp/features/search/screens/search_screen.dart';
+import 'package:myapp/features/history/screens/history_screen.dart';
+import 'package:myapp/features/settings/screens/settings_screen.dart';
 
 
 Future<void> main() async {
@@ -31,7 +30,7 @@ class MyApp extends StatelessWidget {
             title: 'YouTube Downloader',
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
-            themeMode: themeProvider.themeMode,
+            themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
             home: const MainScreen(),
           );
         },
@@ -52,7 +51,6 @@ class _MainScreenState extends State<MainScreen> {
 
   static const List<Widget> _widgetOptions = <Widget>[
     SearchScreen(),
-    DownloaderScreen(),
     HistoryScreen(),
     SettingsScreen(),
   ];
@@ -74,10 +72,6 @@ class _MainScreenState extends State<MainScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
             label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.download),
-            label: 'Downloader',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.history),

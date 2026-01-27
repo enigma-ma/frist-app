@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_downloader/features/search/services/youtube_service.dart';
-import 'package:youtube_downloader/models/video.dart';
-import 'package:youtube_downloader/features/search/widgets/video_card.dart';
+import 'package:myapp/features/downloader/screens/downloader_screen.dart';
+import 'package:myapp/features/search/services/youtube_service.dart';
+import 'package:myapp/models/video.dart';
+import 'package:myapp/features/search/widgets/video_card.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -56,7 +57,17 @@ class _SearchScreenState extends State<SearchScreen> {
                   child: ListView.builder(
                     itemCount: _videos.length,
                     itemBuilder: (context, index) {
-                      return VideoCard(video: _videos[index]);
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DownloaderScreen(video: _videos[index]),
+                            ),
+                          );
+                        },
+                        child: VideoCard(video: _videos[index]),
+                      );
                     },
                   ),
                 ),
