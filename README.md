@@ -4,7 +4,7 @@ A new Flutter project.
 
 ## Download Latest Release
 
-[![Download APK](https://img.shields.io/badge/Download-APK-blue.svg)](https://github.com/enigma-ma/frist-app/releases/download/v1.0.0/app-release.apk)
+[![Download APK](https://img.shields.io/badge/Download-APK-blue.svg)](https://github.com/enigma-ma/frist-app/raw/main/build/app/outputs/flutter-apk/app-release.apk)
 
 Click the button above to download the latest Android APK for installation. After downloading, you may need to enable "Install from unknown sources" in your device's settings to install the application.
 
